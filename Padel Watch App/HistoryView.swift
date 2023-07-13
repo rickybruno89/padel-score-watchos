@@ -34,7 +34,7 @@ struct HistoryView: View {
                     VStack(alignment: .center){
                         Text("Ellos").foregroundColor(match.serveTeam == .they ? .green : .white)
                         Text("\(getScoreLabel(score: match.they.score))")
-                        Text("\(match.they.games)")
+                        Text("\(match.they.sets[0])")
                     }
                     VStack(alignment: .center){
                         Text("Puntos")
@@ -43,7 +43,7 @@ struct HistoryView: View {
                     VStack(alignment: .center){
                         Text("Nos.").foregroundColor(match.serveTeam == .us ? .green : .white)
                         Text("\(getScoreLabel(score: match.us.score))")
-                        Text("\(match.us.games)")
+                        Text("\(match.us.sets[0])")
                     }
                 }
             }

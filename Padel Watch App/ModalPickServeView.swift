@@ -7,7 +7,7 @@ struct ModalPickServeView: View {
     var body: some View {
         VStack {
             Spacer()
-            Text("¿Quién saca primero?")
+            Text("¿Que equipo saca?")
             .multilineTextAlignment(.center)
             Spacer()
 

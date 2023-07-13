@@ -16,15 +16,15 @@ struct ScoreBoardView: View {
     func getScoreScreenPosition(team: TeamName) -> CGPoint{
         if team == .they {
             if currentMatch.servePosition == .right {
-                return CGPoint(x: screenWidth/4*1, y:screenHeight/10*3)
+                return CGPoint(x: screenWidth/4*1, y:screenHeight/50*13)
             } else {
-                return CGPoint(x:screenWidth/4*3, y:screenHeight/10*3)
+                return CGPoint(x:screenWidth/4*3, y:screenHeight/50*13)
             }
         } else {
             if currentMatch.servePosition == .right {
-                return CGPoint(x:screenWidth/4*3, y:screenHeight/7*5)
+                return CGPoint(x:screenWidth/4*3, y:screenHeight/50*37)
             } else {
-                return CGPoint(x:screenWidth/4*1, y:screenHeight/7*5)
+                return CGPoint(x:screenWidth/4*1, y:screenHeight/50*37)
             }
         }
         
@@ -47,26 +47,35 @@ struct ScoreBoardView: View {
         return .green
     }
     
+    func getGamesLabel (_ team: TeamName, _ index: Int) -> String {
+        let currentSetIndex = currentMatch[team].sets.count - 1
+        if(index > currentSetIndex) {
+            return ""
+        }
+        return String(currentMatch[team].sets[index])
+    }
+    
+    func getGamesColor (_ team: TeamName, _ index: Int) -> Color {
+        let currentSetIndex = currentMatch[team].sets.count - 1
+        if(index > currentSetIndex) {
+            return .white
+        }
+        return currentMatch[team].sets[index] == 6 ? .green : .white
+    }
+    
     var body: some View {
         ZStack{
-            // THEY
+            // THEY SCORE
             Button{
                 incrementScore(.they)
             }
             label: {
-                HStack(alignment: .bottom){
-                    Text("\(getScoreLabel(.they))")
-                        .font(.system(size: 40))
-                        .foregroundColor(getScoreColor(.they))
-                        .frame(width: 50, height: 65)
-                    Text("\(currentMatch.they.games)")
-                        .font(.system(size: 20))
-                        .foregroundColor(.white)
-                        .frame(width: 15, height: 55)
-                }
-                    .frame(width: 80, height: 65)
+                Text("\(getScoreLabel(.they))")
+                    .font(.system(size: 35))
+                    .foregroundColor(getScoreColor(.they))
+                    .frame(width: 55, height: 55)
                     .background(Color.black)
-                    .cornerRadius(20)
+                    .cornerRadius(55)
                     .overlay(currentMatch.serveTeam == .they ? GeometryReader { gp in
                                 Image(systemName:"tennisball.fill")
                                     .foregroundColor(.green)
@@ -75,24 +84,71 @@ struct ScoreBoardView: View {
             }
                 .position(getScoreScreenPosition(team: .they))
                 .buttonStyle(PlainButtonStyle())
-            // US
+            // GAMES AND SETS
+            HStack(alignment: .center){
+                Text("Sets (games)")
+                    .font(.system(size: 11))
+                    .multilineTextAlignment(.center)
+                    .frame(width: 50)
+                VStack(spacing: 2.0){
+                    // THEY GAMES
+                    HStack(spacing: 2.0){
+                        Text("\(getGamesLabel(.they,0))")
+                            .font(.system(size: 10))
+                            .frame(width: 13, height: 13)
+                            .border(.white, width: 1)
+                            .foregroundColor(getGamesColor(.they, 0))
+                            .cornerRadius(1)
+                        Text("\(getGamesLabel(.they,1))")
+                            .font(.system(size: 10))
+                            .frame(width: 13, height: 13)
+                            .border(.white, width: 1)
+                            .foregroundColor(getGamesColor(.they, 1))
+                            .cornerRadius(1)
+                        Text("\(getGamesLabel(.they,2))")
+                            .font(.system(size: 10))
+                            .frame(width: 13, height: 13)
+                            .border(.white, width: 1)
+                            .foregroundColor(getGamesColor(.they, 2))
+                            .cornerRadius(1)
+                    }
+                    // US GAMES
+                    HStack(spacing: 2.0){
+                        Text("\(getGamesLabel(.us,0))")
+                            .font(.system(size: 10))
+                            .frame(width: 13, height: 13)
+                            .border(.white, width: 1)
+                            .foregroundColor(getGamesColor(.us, 0))
+                            .cornerRadius(1)
+                        Text("\(getGamesLabel(.us,1))")
+                            .font(.system(size: 10))
+                            .frame(width: 13, height: 13)
+                            .border(.white, width: 1)
+                            .foregroundColor(getGamesColor(.us, 1))
+                            .cornerRadius(1)
+                        Text("\(getGamesLabel(.us,2))")
+                            .font(.system(size: 10))
+                            .frame(width: 13, height: 13)
+                            .border(.white, width: 1)
+                            .foregroundColor(getGamesColor(.us, 2))
+                            .cornerRadius(1)
+                    }
+                }
+            }
+            .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
+            .background(.black)
+            .cornerRadius(5)
+            // US SCORE
             Button{
                 incrementScore(.us)
             }
             label: {
-                HStack(alignment: .bottom){
-                    Text("\(getScoreLabel(.us))")
-                        .font(.system(size: 40))
-                        .foregroundColor(getScoreColor(.us))
-                        .frame(width: 50, height: 65)
-                    Text("\(currentMatch.us.games)")
-                        .font(.system(size: 20))
-                        .foregroundColor(.white)
-                        .frame(width: 15, height: 55)
-                }
-                    .frame(width: 80, height: 65)
+                Text("\(getScoreLabel(.us))")
+                    .font(.system(size: 35))
+                    .foregroundColor(getScoreColor(.us))
+                    .frame(width: 55, height: 55)
                     .background(Color.black)
-                    .cornerRadius(20)
+                    .cornerRadius(55)
                     .overlay(currentMatch.serveTeam == .us ? GeometryReader { gp in
                                 Image(systemName:"tennisball.fill")
                                     .foregroundColor(.green)
@@ -101,7 +157,16 @@ struct ScoreBoardView: View {
             }
                 .position(getScoreScreenPosition(team: .us))
                 .buttonStyle(PlainButtonStyle())
-            
+        }
+    }
+}
+
+struct ScoreBoardView_Previews: PreviewProvider {
+    static var previews: some View {
+        var match: Match = Match(they: Team(score: 0,  sets: [0]), us: Team(score: 0,  sets: [0]), serveTeam: .they, servePosition: .right)
+        ZStack{
+            CourtView()
+            ScoreBoardView(incrementScore: { _ in }, currentMatch: match)
         }
     }
 }

@@ -17,7 +17,7 @@ enum TeamName: String {
 
 struct Team {
     var score: Int
-    var games: Int
+    var sets: [Int]
 }
 
 struct Match {
@@ -26,18 +26,21 @@ struct Match {
     var serveTeam: TeamName
     var servePosition: ServePosition
     
-    mutating func updateTeam(for team: TeamName, score: Int, games: Int? = nil) {
+    mutating func updateTeamScore(for team: TeamName, score: Int) {
         switch team {
         case .they:
             they.score = score
-            if let games = games {
-                they.games = games
-            }
         case .us:
             us.score = score
-            if let games = games {
-                us.games = games
-            }
+        }
+    }
+    
+    mutating func updateTeamSets(for team: TeamName, sets: [Int]) {
+        switch team {
+        case .they:
+            they.sets = sets
+        case .us:
+            us.sets = sets
         }
     }
     
@@ -56,7 +59,7 @@ struct ContentView: View {
     let screenWidth = WKInterfaceDevice.current().screenBounds.width
     let screenHeight = WKInterfaceDevice.current().screenBounds.height
     @State var matchesIndex = 0
-    @State var matches: [Match] = [Match(they: Team(score: 0, games: 0), us: Team(score: 0, games: 0), serveTeam: .they, servePosition: .right)]
+    @State var matches: [Match] = [Match(they: Team(score: 0, sets: [0]), us: Team(score: 0, sets: [0]), serveTeam: .they, servePosition: .right)]
     @State private var isPresentingModalView = true
     @State private var isShowingDialog = false
     
@@ -67,39 +70,65 @@ struct ContentView: View {
         
         switch currentMatch[team].score {
             case 0:
-                nextMatch.updateTeam(for: team, score: 15)
+                nextMatch.updateTeamScore(for: team, score: 15)
                 nextMatch.servePosition = getNewServePosition()
                 WKInterfaceDevice.current().play(.notification)
             case 15:
-                nextMatch.updateTeam(for: team, score: 30)
+                nextMatch.updateTeamScore(for: team, score: 30)
                 nextMatch.servePosition = getNewServePosition()
                 WKInterfaceDevice.current().play(.notification)
             case 30:
-                nextMatch.updateTeam(for: team, score: 40)
+                nextMatch.updateTeamScore(for: team, score: 40)
                 nextMatch.servePosition = getNewServePosition()
                 WKInterfaceDevice.current().play(.notification)
             case 40:
                 switch currentMatch[otherTeam].score {
                     case 40:
-                        nextMatch.updateTeam(for: team, score: 55)
+                        nextMatch.updateTeamScore(for: team, score: 55)
                         nextMatch.servePosition = getNewServePosition()
                         WKInterfaceDevice.current().play(.notification)
                     case 55:
-                        nextMatch.updateTeam(for: otherTeam, score: 40)
+                        nextMatch.updateTeamScore(for: otherTeam, score: 40)
                         nextMatch.servePosition = getNewServePosition()
                         WKInterfaceDevice.current().play(.notification)
                     default:
-                        nextMatch.updateTeam(for: team, score: 0, games: nextMatch[team].games+1)
-                        nextMatch.updateTeam(for: otherTeam, score: 0)
+                        nextMatch.updateTeamScore(for: team, score: 0)
+                        nextMatch.updateTeamScore(for: otherTeam, score: 0)
                         nextMatch.serveTeam = getNewTeamServe()
                         nextMatch.servePosition = .right
+                        let currentTeamSetsIndex = currentMatch[team].sets.count - 1
+                        var nextTeamSets = currentMatch[team].sets
+                        nextTeamSets[currentTeamSetsIndex] += 1
+                        nextMatch.updateTeamSets(for: team, sets: nextTeamSets)
+                        if(nextTeamSets[currentTeamSetsIndex] == 6) {
+                            var newTeamSetsTemp = nextTeamSets
+                            var newOtherTeamSets = currentMatch[otherTeam].sets
+                            newTeamSetsTemp.append(0)
+                            print(newTeamSetsTemp)
+                            newOtherTeamSets.append(0)
+                            nextMatch.updateTeamSets(for: team, sets: newTeamSetsTemp)
+                            nextMatch.updateTeamSets(for: otherTeam, sets: newOtherTeamSets)
+                        }
                         WKInterfaceDevice.current().play(.success)
                 }
             case 55:
-                nextMatch.updateTeam(for: team, score: 0, games: nextMatch[team].games+1)
-                nextMatch.updateTeam(for: otherTeam, score: 0)
+                nextMatch.updateTeamScore(for: team, score: 0)
+                nextMatch.updateTeamScore(for: otherTeam, score: 0)
                 nextMatch.serveTeam = getNewTeamServe()
                 nextMatch.servePosition = .right
+                let currentTeamSetsIndex = currentMatch[team].sets.count - 1
+                var nextTeamSets = currentMatch[team].sets
+                nextTeamSets[currentTeamSetsIndex] += 1
+                nextMatch.updateTeamSets(for: team, sets: nextTeamSets)
+                if(nextTeamSets[currentTeamSetsIndex] == 6) {
+                    var newTeamSetsTemp = nextTeamSets
+                    var newOtherTeamSets = currentMatch[otherTeam].sets
+                    newTeamSetsTemp.append(0)
+                    print(newTeamSetsTemp)
+                    newOtherTeamSets.append(0)
+                    nextMatch.updateTeamSets(for: team, sets: newTeamSetsTemp)
+                    nextMatch.updateTeamSets(for: otherTeam, sets: newOtherTeamSets)
+                }
                 WKInterfaceDevice.current().play(.success)
             default:
                 break
@@ -155,7 +184,7 @@ struct ContentView: View {
     
     func newMatch() {
         matchesIndex = 0
-        matches = [Match(they: Team(score: 0, games: 0), us: Team(score: 0, games: 0), serveTeam: .they, servePosition: .right)]
+        matches = [Match(they: Team(score: 0, sets: [0]), us: Team(score: 0,  sets: [0]), serveTeam: .they, servePosition: .right)]
         isPresentingModalView = true
     }
     
