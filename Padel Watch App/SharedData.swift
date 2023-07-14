@@ -186,7 +186,7 @@ class SharedData: ObservableObject {
     func newMatch() {
         matchesIndex = 0
         matches = [Match(they: Team(score: 0, sets: [0]), us: Team(score: 0,  sets: [0]), serveTeam: .they, servePosition: .right)]
-        // TODO navegar a la view esa
+        selectedTab = 1
     }
     
     func undo() {

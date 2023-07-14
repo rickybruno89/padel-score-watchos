@@ -25,7 +25,6 @@ struct PageThreeView: View {
                 ) {
                     Button("Finalizar partida", role: .destructive) {
                         sharedData.newMatch()
-                        sharedData.selectedTab = 1
                     }.padding(.horizontal).cornerRadius(20)
                     Button("Cancelar", role: .cancel) {}
                 }
