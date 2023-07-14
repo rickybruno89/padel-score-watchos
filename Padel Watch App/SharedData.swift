@@ -1,11 +1,12 @@
 //
-//  ContentView.swift
+//  SharedData.swift
 //  Padel Watch App
 //
-//  Created by Ricky Bruno on 11/07/2023.
+//  Created by Ricky Bruno on 14/07/2023.
 //
 
 import SwiftUI
+
 
 enum ServePosition: String {
     case left, right
@@ -55,15 +56,14 @@ struct Match {
     
 }
 
-struct ContentView: View {
-    let screenWidth = WKInterfaceDevice.current().screenBounds.width
-    let screenHeight = WKInterfaceDevice.current().screenBounds.height
-    @State var matchesIndex = 0
-    @State var matches: [Match] = [Match(they: Team(score: 0, sets: [0]), us: Team(score: 0, sets: [0]), serveTeam: .they, servePosition: .right)]
-    @State private var isPresentingModalView = true
-    @State private var isShowingDialog = false
+class SharedData: ObservableObject {
+    @Published var selectedTab = 1
+    @Published var screenWidth = WKInterfaceDevice.current().screenBounds.width
+    @Published var screenHeight = WKInterfaceDevice.current().screenBounds.height
+    @Published var matchesIndex = 0
+    @Published var matches: [Match] = [Match(they: Team(score: 0, sets: [0]), us: Team(score: 0, sets: [0]), serveTeam: .they, servePosition: .right)]
     
-    func incrementScore(team: TeamName){
+    func incrementScore(_ team: TeamName){
         let currentMatch = getCurrentGame()
         var nextMatch = getCurrentGame()
         let otherTeam: TeamName = team == .they ? .us : .they
@@ -178,14 +178,15 @@ struct ContentView: View {
         return matches[matchesIndex]
     }
     
-    func pickServeTeam(team: TeamName){
+    func pickServeTeam(_ team: TeamName){
         matches[matchesIndex].serveTeam = team
+        selectedTab = 2
     }
     
     func newMatch() {
         matchesIndex = 0
         matches = [Match(they: Team(score: 0, sets: [0]), us: Team(score: 0,  sets: [0]), serveTeam: .they, servePosition: .right)]
-        isPresentingModalView = true
+        // TODO navegar a la view esa
     }
     
     func undo() {
@@ -200,41 +201,5 @@ struct ContentView: View {
         }
     }
     
-    var body: some View {
-        ScrollView{
-            ZStack{
-                CourtView()
-                ScoreBoardView(incrementScore: { team in self.incrementScore(team: team) }, currentMatch: getCurrentGame())
-               ActionButtonsView(undo: { self.undo() }, redo: { self.redo() })
-            }
-            VStack{
-                Button("Nueva partida") {
-                    isShowingDialog = true
-                }
-                .background(.red)
-                .cornerRadius(20)
-                .confirmationDialog(
-                    "¿Desea finalizar la partida actual y comenzar una nueva partida?",
-                    isPresented: $isShowingDialog
-                ) {
-                    Button("Finalizar partida", role: .destructive) {
-                        newMatch()
-                    }
-                    Button("Cancelar", role: .cancel) {}
-                }
-                HistoryView(matches: matches).padding(.top, 10).padding(.bottom, 30)
-            }
-            .padding(.top, 10)
-            .background(.black).frame(width: screenWidth)
-            .fullScreenCover(isPresented: $isPresentingModalView) {
-                ModalPickServeView(isPresented: $isPresentingModalView, pickServeTeam: { team in self.pickServeTeam(team: team) }).navigationBarHidden(true)
-            }
-        }.navigationBarHidden(true).ignoresSafeArea()
-    }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}

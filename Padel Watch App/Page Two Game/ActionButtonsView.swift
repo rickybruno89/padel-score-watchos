@@ -8,16 +8,13 @@
 import SwiftUI
 
 struct ActionButtonsView: View {
-    var undo: () -> Void
-    var redo: () -> Void
-    let screenWidth = WKInterfaceDevice.current().screenBounds.width
-    let screenHeight = WKInterfaceDevice.current().screenBounds.height
+    @EnvironmentObject var sharedData: SharedData
     
     var body: some View {
         ZStack{
             HStack{
                 Button{
-                    undo()
+                    sharedData.undo()
                     WKInterfaceDevice.current().play(.directionDown)
                 } label: {
                     Image(systemName: "arrow.uturn.left")
@@ -28,10 +25,10 @@ struct ActionButtonsView: View {
                         .cornerRadius(22)
                         .padding()
                 }
-                    .position(x:screenWidth/10*4, y:screenHeight/100*94)
+                .position(x:sharedData.screenWidth/10*4, y:sharedData.screenHeight/100*6)
                     .buttonStyle(PlainButtonStyle())
                 Button{
-                    redo()
+                    sharedData.redo()
                     WKInterfaceDevice.current().play(.directionUp)
                 } label: {
                     Image(systemName: "arrow.uturn.right")
@@ -42,7 +39,7 @@ struct ActionButtonsView: View {
                         .cornerRadius(22)
                         .padding()
                 }
-                .position(x:screenWidth/10, y:screenHeight/100*94)
+                .position(x:sharedData.screenWidth/10, y:sharedData.screenHeight/100*6)
                 .buttonStyle(PlainButtonStyle())
             }
         }

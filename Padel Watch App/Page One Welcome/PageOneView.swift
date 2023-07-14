@@ -1,8 +1,7 @@
 import SwiftUI
 
-struct ModalPickServeView: View {
-    @Binding var isPresented: Bool
-    var pickServeTeam: (TeamName) -> Void
+struct PageOneView: View {
+    @EnvironmentObject var sharedData: SharedData
     
     var body: some View {
         VStack {
@@ -10,17 +9,12 @@ struct ModalPickServeView: View {
             Text("¿Que equipo saca?")
             .multilineTextAlignment(.center)
             Spacer()
-
             Button("Ellos") {
-                isPresented.toggle()
-                pickServeTeam(.they)
+                sharedData.pickServeTeam(.they)
             }.padding(.horizontal)
             Button("Nosotros") {
-                isPresented.toggle()
-                pickServeTeam(.us)
+                sharedData.pickServeTeam(.us)
             }.padding(.horizontal)
         }
-
-       
     }
 }

@@ -9,9 +9,10 @@ import SwiftUI
 
 @main
 struct Padel_Watch_AppApp: App {
+    var sharedData = SharedData()
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PagesView().environmentObject(sharedData)
         }
     }
 }

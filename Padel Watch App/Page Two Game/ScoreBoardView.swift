@@ -8,23 +8,20 @@
 import SwiftUI
 
 struct ScoreBoardView: View {
-    var incrementScore: (TeamName) -> Void
-    var currentMatch: Match
-    let screenWidth = WKInterfaceDevice.current().screenBounds.width
-    let screenHeight = WKInterfaceDevice.current().screenBounds.height
+    @EnvironmentObject var sharedData: SharedData
     
     func getScoreScreenPosition(team: TeamName) -> CGPoint{
         if team == .they {
-            if currentMatch.servePosition == .right {
-                return CGPoint(x: screenWidth/4*1, y:screenHeight/50*13)
+            if sharedData.getCurrentGame().servePosition == .right {
+                return CGPoint(x: sharedData.screenWidth/4*1, y:sharedData.screenHeight/50*14)
             } else {
-                return CGPoint(x:screenWidth/4*3, y:screenHeight/50*13)
+                return CGPoint(x:sharedData.screenWidth/4*3, y:sharedData.screenHeight/50*14)
             }
         } else {
-            if currentMatch.servePosition == .right {
-                return CGPoint(x:screenWidth/4*3, y:screenHeight/50*37)
+            if sharedData.getCurrentGame().servePosition == .right {
+                return CGPoint(x:sharedData.screenWidth/4*3, y:sharedData.screenHeight/50*36)
             } else {
-                return CGPoint(x:screenWidth/4*1, y:screenHeight/50*37)
+                return CGPoint(x:sharedData.screenWidth/4*1, y:sharedData.screenHeight/50*36)
             }
         }
         
@@ -32,7 +29,7 @@ struct ScoreBoardView: View {
     
     
     func getScoreLabel(_ team: TeamName) -> String {
-        let score = currentMatch[team].score
+        let score = sharedData.getCurrentGame()[team].score
         if score <= 40 {
             return String(score)
         }
@@ -40,7 +37,7 @@ struct ScoreBoardView: View {
     }
     
     func getScoreColor(_ team: TeamName) -> Color {
-        let score = currentMatch[team].score
+        let score = sharedData.getCurrentGame()[team].score
         if score <= 40 {
             return .white
         }
@@ -48,38 +45,39 @@ struct ScoreBoardView: View {
     }
     
     func getGamesLabel (_ team: TeamName, _ index: Int) -> String {
-        let currentSetIndex = currentMatch[team].sets.count - 1
+        let currentSetIndex = sharedData.getCurrentGame()[team].sets.count - 1
         if(index > currentSetIndex) {
             return ""
         }
-        return String(currentMatch[team].sets[index])
+        return String(sharedData.getCurrentGame()[team].sets[index])
     }
     
     func getGamesColor (_ team: TeamName, _ index: Int) -> Color {
-        let currentSetIndex = currentMatch[team].sets.count - 1
+        let currentSetIndex = sharedData.getCurrentGame()[team].sets.count - 1
         if(index > currentSetIndex) {
             return .white
         }
-        return currentMatch[team].sets[index] == 6 ? .green : .white
+        return sharedData.getCurrentGame()[team].sets[index] == 6 ? .green : .white
     }
     
     var body: some View {
         ZStack{
             // THEY SCORE
             Button{
-                incrementScore(.they)
+                sharedData.incrementScore(.they)
             }
             label: {
                 Text("\(getScoreLabel(.they))")
-                    .font(.system(size: 35))
+                    .font(.system(size: 24))
                     .foregroundColor(getScoreColor(.they))
-                    .frame(width: 55, height: 55)
+                    .frame(width: 48, height: 48)
                     .background(Color.black)
-                    .cornerRadius(55)
-                    .overlay(currentMatch.serveTeam == .they ? GeometryReader { gp in
+                    .cornerRadius(10)
+                    .overlay(sharedData.getCurrentGame().serveTeam == .they ? GeometryReader { gp in
                                 Image(systemName:"tennisball.fill")
+                                    .font(.system(size: 13))
                                     .foregroundColor(.green)
-                                    .position(x: gp.size.width/10*9, y: gp.size.height/10*1)
+                                    .position(x: gp.size.width/50*42, y: gp.size.height/50*8)
                         } : nil)
             }
                 .position(getScoreScreenPosition(team: .they))
@@ -140,19 +138,21 @@ struct ScoreBoardView: View {
             .cornerRadius(5)
             // US SCORE
             Button{
-                incrementScore(.us)
+                sharedData.incrementScore(.us)
             }
             label: {
                 Text("\(getScoreLabel(.us))")
-                    .font(.system(size: 35))
-                    .foregroundColor(getScoreColor(.us))
-                    .frame(width: 55, height: 55)
+                    .font(.system(size: 24))
+                    .foregroundColor(getScoreColor(.they))
+                    .frame(width: 48, height: 48)
                     .background(Color.black)
-                    .cornerRadius(55)
-                    .overlay(currentMatch.serveTeam == .us ? GeometryReader { gp in
+                    .cornerRadius(10)
+                    .overlay(sharedData.getCurrentGame().serveTeam == .us ? GeometryReader { gp in
                                 Image(systemName:"tennisball.fill")
                                     .foregroundColor(.green)
-                                    .position(x: gp.size.width/10*9, y: gp.size.height/10*1)
+                                    .font(.system(size: 13))
+                                    .frame(width: 15, height: 15)
+                                    .position(x: gp.size.width/50*42, y: gp.size.height/50*8)
                         } : nil)
             }
                 .position(getScoreScreenPosition(team: .us))
@@ -163,10 +163,12 @@ struct ScoreBoardView: View {
 
 struct ScoreBoardView_Previews: PreviewProvider {
     static var previews: some View {
-        var match: Match = Match(they: Team(score: 0,  sets: [0]), us: Team(score: 0,  sets: [0]), serveTeam: .they, servePosition: .right)
+          let sharedData = SharedData()
         ZStack{
             CourtView()
-            ScoreBoardView(incrementScore: { _ in }, currentMatch: match)
+            ScoreBoardView()
+            ActionButtonsView()
         }
-    }
+              .environmentObject(sharedData)
+      }
 }

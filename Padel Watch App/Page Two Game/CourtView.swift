@@ -78,9 +78,3 @@ struct CourtView: View {
         .background(.blue)
     }
 }
-
-struct CourtView_Previews: PreviewProvider {
-    static var previews: some View {
-        CourtView()
-    }
-}

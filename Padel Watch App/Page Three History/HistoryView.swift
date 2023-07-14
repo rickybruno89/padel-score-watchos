@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HistoryView: View {
-    var matches: [Match]
+    @EnvironmentObject var sharedData: SharedData
     
     func getScoreLabel(score: Int) -> String {
         if score <= 40 {
@@ -27,8 +27,8 @@ struct HistoryView: View {
                 .aspectRatio(contentMode: .fill)
                 .foregroundColor(.green)
                 .frame(width: 25, height: 25)
-            ForEach(matches.indices, id: \.self) { index in
-                let match = matches[index]
+            ForEach(sharedData.matches.indices, id: \.self) { index in
+                let match = sharedData.matches[index]
                 Divider().background(Color.white.frame(height: 2))
                 HStack(alignment: .bottom){
                     VStack(alignment: .center){
